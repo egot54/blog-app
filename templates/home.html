@@ -1,0 +1,210 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Главная</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 24px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-3px);
+        }
+        .btn {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+        .btn:hover {
+            transform: scale(1.02);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        .btn-outline {
+            background: transparent;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+        .tag {
+            display: inline-block;
+            background: #e9ecef;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            color: #495057;
+            margin: 2px;
+            text-decoration: none;
+        }
+        .tag:hover {
+            background: #dee2e6;
+        }
+        .private-badge {
+            background: #e74c3c;
+            color: white;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            margin-left: 10px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .header h1 {
+            color: white;
+            font-size: 32px;
+            margin: 0;
+        }
+        .header .btns {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .username {
+            color: white;
+            font-weight: 600;
+            margin-right: 10px;
+        }
+        .btn-login {
+            background: #3498db;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .btn-login:hover {
+            background: #2980b9;
+        }
+        .btn-register {
+            background: #2ecc71;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .btn-register:hover {
+            background: #27ae60;
+        }
+        .btn-logout {
+            background: #e74c3c;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .btn-logout:hover {
+            background: #c0392b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Блог разработчика</h1>
+            <div class="btns">
+                {% if user.is_authenticated %}
+                    <span class="username">👋 {{ user.username }}</span>
+                    <a href="{% url 'feed' %}" class="btn-primary btn">📰 Лента</a>
+                    <a href="{% url 'addblog' %}" class="btn-primary btn">✏️ Создать пост</a>
+                    <a href="{% url 'logout' %}" class="btn-logout">🚪 Выйти</a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="btn-login">🔑 Войти</a>
+                    <a href="{% url 'register' %}" class="btn-register">📝 Регистрация</a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- ОБЛАКО ТЕГОВ -->
+        <div class="card" style="background: rgba(255,255,255,0.9);">
+            <h3 style="font-weight: 600; color: #1a202c; margin-bottom: 10px;">🏷️ Теги</h3>
+            <div style="display: flex; flex-wrap: wrap; gap: 5px;">
+                {% for post in blog_qset %}
+                    {% for tag in post.tags.all %}
+                        <a href="?tag={{ tag.name }}" class="tag">#{{ tag.name }}</a>
+                    {% endfor %}
+                {% empty %}
+                    <p style="color: #718096;">Нет тегов</p>
+                {% endfor %}
+            </div>
+            {% if request.GET.tag %}
+                <div style="margin-top: 10px;">
+                    <a href="{% url 'home' %}" class="btn btn-outline" style="font-size: 14px; padding: 4px 12px;">✖️ Снять фильтр</a>
+                </div>
+            {% endif %}
+        </div>
+
+        {% for post in blog_qset %}
+        <div class="card">
+            <h2 style="font-size: 24px; font-weight: 700; color: #1a202c;">
+                {{ post.title }}
+                {% if post.is_private %}
+                    <span class="private-badge">🔒 Приватный</span>
+                {% endif %}
+            </h2>
+            <div class="meta" style="color: #718096; font-size: 14px; margin: 8px 0;">
+                <span>✍️ <a href="{% url 'user_profile' post.author %}" style="color: #667eea; text-decoration: none;">{{ post.author }}</a></span>
+                <span style="margin-left: 20px;">📂 {{ post.category }}</span>
+                <span style="margin-left: 20px;">📅 {{ post.created|date:"d.m.Y H:i" }}</span>
+            </div>
+            {% if post.thumbnail %}
+            <img src="{{ post.thumbnail }}" alt="{{ post.title }}" style="max-height: 300px; object-fit: cover; border-radius: 12px; margin: 10px 0;">
+            {% endif %}
+            <div class="content" style="color: #2d3748; margin: 12px 0;">
+                {{ post.desc|truncatewords:30 }}
+            </div>
+
+            <!-- ТЕГИ -->
+            {% if post.tags.all %}
+                <div style="margin: 10px 0;">
+                    {% for tag in post.tags.all %}
+                        <a href="?tag={{ tag.name }}" class="tag">#{{ tag.name }}</a>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <a href="{% url 'blogcontent' post.title %}" class="btn btn-primary">Читать →</a>
+        </div>
+        {% empty %}
+        <div class="card" style="text-align: center; padding: 60px 20px;">
+            <div style="font-size: 64px;">📝</div>
+            <h2 style="color: #1a202c;">Нет постов</h2>
+            <p style="color: #718096;">Создайте свой первый пост!</p>
+            <a href="{% url 'addblog' %}" class="btn btn-primary" style="margin-top: 20px;">✏️ Создать пост</a>
+        </div>
+        {% endfor %}
+    </div>
+</body>
+</html>

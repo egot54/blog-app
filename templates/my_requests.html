@@ -1,0 +1,87 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Запросы на доступ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+        }
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        .card {
+            background: white;
+            border-radius: 24px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .btn {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .btn:hover {
+            transform: scale(1.02);
+        }
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+        .btn-home {
+            background: #2d3748;
+            color: white;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: white;
+            font-size: 32px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📩 Запросы на доступ</h1>
+            <a href="{% url 'home' %}" class="btn btn-home">🏠 На главную</a>
+        </div>
+
+        {% if requests %}
+            {% for req in requests %}
+            <div class="card">
+                <p><strong>📝 Пост:</strong> {{ req.post.title }}</p>
+                <p><strong>👤 Пользователь:</strong> {{ req.user.username }}</p>
+                <p><strong>📅 Дата:</strong> {{ req.created_at|date:"d.m.Y H:i" }}</p>
+                <form method="POST" action="{% url 'approve_access' req.id %}" style="margin-top: 10px;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success">✅ Одобрить доступ</button>
+                </form>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="card" style="text-align: center; padding: 60px 20px;">
+                <div style="font-size: 64px;">📭</div>
+                <h2 style="color: #1a202c;">Нет запросов</h2>
+                <p style="color: #718096;">Пока никто не запрашивал доступ к вашим приватным постам</p>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>

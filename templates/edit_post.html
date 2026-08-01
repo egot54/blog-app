@@ -1,0 +1,98 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Редактировать пост</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .form-card {
+            background: white;
+            border-radius: 24px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .form-card h1 {
+            text-align: center;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .form-card input, .form-card textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            font-size: 16px;
+        }
+        .form-card input:focus, .form-card textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .form-card button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .form-card .link {
+            text-align: center;
+            margin-top: 16px;
+            color: #6b7280;
+        }
+        .form-card .link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .btn-danger {
+            background: linear-gradient(135deg, #e74c3c, #c0392b) !important;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-card">
+        <h1>✏️ Редактировать пост</h1>
+
+        <form method="POST">
+            {% csrf_token %}
+            <input type="text" name="title" value="{{ post.title }}" required>
+            <textarea name="desc" rows="4" required>{{ post.desc }}</textarea>
+            <input type="text" name="category" value="{{ post.category }}">
+            <input type="url" name="thumbnail" value="{{ post.thumbnail }}">
+            <button type="submit">Сохранить изменения</button>
+        </form>
+
+        <form method="POST" action="{% url 'delete_post' post.id %}" style="margin-top:10px;">
+            {% csrf_token %}
+            <button type="submit" class="btn-danger" onclick="return confirm('Удалить пост?')">🗑️ Удалить пост</button>
+        </form>
+
+        <div class="link">
+            <a href="{% url 'home' %}">← На главную</a>
+        </div>
+    </div>
+</body>
+</html>

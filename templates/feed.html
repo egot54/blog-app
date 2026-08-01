@@ -1,0 +1,137 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Лента подписок</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 24px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-3px);
+        }
+        .card h2 {
+            color: #1a202c;
+            font-size: 24px;
+            font-weight: 700;
+        }
+        .card .meta {
+            color: #718096;
+            font-size: 14px;
+            margin: 8px 0;
+        }
+        .card .meta a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        .card .meta a:hover {
+            text-decoration: underline;
+        }
+        .card .content {
+            color: #2d3748;
+            margin: 12px 0;
+        }
+        .btn {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            transition: transform 0.2s;
+        }
+        .btn:hover {
+            transform: scale(1.02);
+        }
+        .btn-home {
+            background: linear-gradient(135deg, #2d3748, #4a5568);
+            color: white;
+            padding: 10px 24px;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+        .empty-state .icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+        .empty-state h2 {
+            color: white;
+            font-size: 28px;
+        }
+        .empty-state p {
+            color: rgba(255,255,255,0.8);
+            font-size: 18px;
+        }
+        .empty-state .btn {
+            margin-top: 20px;
+            padding: 12px 30px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: white;
+            font-size: 32px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📰 Лента подписок</h1>
+            <a href="{% url 'home' %}" class="btn btn-home">🏠 На главную</a>
+        </div>
+
+        {% if posts %}
+            {% for post in posts %}
+            <div class="card">
+                <h2>{{ post.title }}</h2>
+                <div class="meta">
+                    <span>✍️ <a href="{% url 'user_profile' post.author %}">{{ post.author }}</a></span>
+                    <span style="margin-left: 20px;">📂 {{ post.category }}</span>
+                    <span style="margin-left: 20px;">📅 {{ post.created|date:"d.m.Y H:i" }}</span>
+                </div>
+                {% if post.thumbnail %}
+                <img src="{{ post.thumbnail }}" alt="{{ post.title }}" class="w-full rounded-lg my-3" style="max-height: 300px; object-fit: cover;">
+                {% endif %}
+                <div class="content">
+                    {{ post.desc|truncatewords:30 }}
+                </div>
+                <a href="{% url 'blogcontent' post.title %}" class="btn">Читать →</a>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="card empty-state" style="background: rgba(255,255,255,0.9);">
+                <div class="icon">📭</div>
+                <h2 style="color: #1a202c;">Нет постов</h2>
+                <p style="color: #718096;">Подпишитесь на авторов, чтобы видеть их посты здесь</p>
+                <a href="{% url 'home' %}" class="btn">Найти авторов</a>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>
